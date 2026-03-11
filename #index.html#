@@ -361,8 +361,7 @@
         <b>Step 1</b> Drag any LCs from the <b class="area">Unranked LCs</b>
         area into the <b class="area">Currently ranked</b> area and put them in
         the order of your preference. Your current LC is already
-        in <b class="area">Currently ranked</b> and can't be removed. (Unless
-        your current LC is not one of LCs in the lottery.)
+        in <b class="area">Currently ranked</b> and can't be removed.
       </p>
       <p>
         <b>Step 2</b> Drag your LC choices in the <b class="area">Currently
@@ -395,17 +394,10 @@
         <li class="draggable" draggable="true" data-index="5"><span class="lc">CAS</span></li>
       </ul>
 
-      <p class="empty-note default-empty-note">
+      <p class="empty-note">
         All small LCs ranked. Remember, only rank small LCs that you are willing
         to be placed in. If you have ranked any small LCs that you would not
-        want to be in, drag them out of the <b class="area">Currently ranked</b>
-        area to unrank them.
-      </p>
-      <p class="empty-note upper-grade-empty-note">
-        All LCs ranked. Remember, only rank LCs that you are willing to be
-        placed in. If you have ranked any LCs that you would not want to be in,
-        drag them out of the <b class="area">Currently ranked</b> area to unrank
-        them. You may not, however, unrank your current LC.
+        want to be in, drag them out of the <b class="area">Currently ranked</b> area to unrank them.
       </p>
     </fieldset>
 
@@ -635,8 +627,7 @@ const updateRankNumbers = () => {
 const maybeShowEmptyNote = () => {
   if (smallSchools.children.length === 0) {
     smallSchools.style.display = 'none';
-    const noteClass = isUpperGrade ? 'upper-grade-empty-note' : 'default-empty-note';
-    smallSchools.parentNode.querySelector('.' + noteClass).style.display = 'block';
+    smallSchools.parentNode.querySelector('p').style.display = 'block';
   }
 };
 
@@ -841,9 +832,8 @@ const initFromUpperGrades = (lc) => {
   const allTiles = [...$$('.tiles .draggable')];
   ranks.replaceChildren();
   smallSchools.replaceChildren();
-  const knownLcs = new Set([...REQUIRED, ...SLCS]);
   allTiles.forEach(tile => {
-    if (lcName(tile) === assignedLc && knownLcs.has(assignedLc)) {
+    if (lcName(tile) === assignedLc) {
       ensureRank(tile, 1);
       ranks.append(tile);
     } else {

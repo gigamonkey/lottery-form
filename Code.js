@@ -44,6 +44,14 @@ const rankingsSheet = () => {
   return SpreadsheetApp.getActiveSpreadsheet().getSheetById(0);
 };
 
+const getLcForStudent = (email) => {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Upper grades');
+  const emails = sheet.getRange(1, 1, sheet.getLastRow(), 1).getValues().flat();
+  const idx = emails.indexOf(email);
+  if (idx === -1) return null;
+  return sheet.getRange(idx + 1, 2).getValue();
+};
+
 const currentRankings = (email) => {
   const sheet = rankingsSheet();
   const data = sheet.getDataRange().getValues();
