@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:registry.npmjs.org)",
+      "WebFetch(domain:script.googleapis.com)",
+      "WebFetch(domain:oauth2.googleapis.com)",
+      "Bash(./node_modules/.bin/clasp clone:*)"
+    ]
+  }
+}
