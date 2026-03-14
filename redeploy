@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if [ $# -eq 0 ]; then
+  echo "Usage: $0 <description>" >&2
+  exit 1
+fi
+
+DESCRIPTION="$*"
+CLASP="./node_modules/.bin/clasp"
+
+echo "Pushing..."
+$CLASP push
+
+echo "Creating version..."
+VERSION_OUTPUT=$($CLASP create-version "$DESCRIPTION")
+echo "$VERSION_OUTPUT"
+VERSION=$(echo "$VERSION_OUTPUT" | grep -oE 'version [0-9]+' | grep -oE '[0-9]+')
+
+if [ -z "$VERSION" ]; then
+  echo "Error: could not parse version number from: $VERSION_OUTPUT" >&2
+  exit 1
+fi
+
+DEPLOYMENT_ID=$($CLASP list-deployments | grep '^-' | grep -v '@HEAD' | awk '{print $2}' | head -1)
+
+if [ -z "$DEPLOYMENT_ID" ]; then
+  echo "Error: could not find a non-HEAD deployment to update" >&2
+  exit 1
+fi
+
+echo "Redeploying to version $VERSION (deployment $DEPLOYMENT_ID)..."
+$CLASP update-deployment "$DEPLOYMENT_ID" -V "$VERSION" -d "$DESCRIPTION"
+echo "Done."
