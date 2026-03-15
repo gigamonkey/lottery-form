@@ -2,13 +2,35 @@
 
 set -euo pipefail
 
-if [ $# -eq 0 ]; then
+CLASP="./node_modules/.bin/clasp"
+
+usage() {
   echo "Usage: $0 <description>" >&2
+  echo "       $0 --rollback <version>" >&2
+  exit 1
+}
+
+if [ $# -eq 0 ]; then
+  usage
+fi
+
+DEPLOYMENT_ID=$($CLASP list-deployments | grep '^-' | grep -v '@HEAD' | awk '{print $2}' | head -1)
+
+if [ -z "$DEPLOYMENT_ID" ]; then
+  echo "Error: could not find a non-HEAD deployment to update" >&2
   exit 1
 fi
 
+if [ "$1" = "--rollback" ]; then
+  [ $# -eq 2 ] || usage
+  VERSION="$2"
+  echo "Rolling back to version $VERSION (deployment $DEPLOYMENT_ID)..."
+  $CLASP update-deployment "$DEPLOYMENT_ID" -V "$VERSION" -d "rollback to v$VERSION"
+  echo "Done."
+  exit 0
+fi
+
 DESCRIPTION="$*"
-CLASP="./node_modules/.bin/clasp"
 
 echo "Pushing..."
 $CLASP push
@@ -20,13 +42,6 @@ VERSION=$(echo "$VERSION_OUTPUT" | grep -oE 'version [0-9]+' | grep -oE '[0-9]+'
 
 if [ -z "$VERSION" ]; then
   echo "Error: could not parse version number from: $VERSION_OUTPUT" >&2
-  exit 1
-fi
-
-DEPLOYMENT_ID=$($CLASP list-deployments | grep '^-' | grep -v '@HEAD' | awk '{print $2}' | head -1)
-
-if [ -z "$DEPLOYMENT_ID" ]; then
-  echo "Error: could not find a non-HEAD deployment to update" >&2
   exit 1
 fi
 
