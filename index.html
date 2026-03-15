@@ -84,7 +84,7 @@
         margin: 0.5em 0;
       }
 
-      &>div {
+      & .explanation {
         font-size: 16px;
         padding: 0.5em;
         border: 1px solid #ddd;
@@ -312,6 +312,14 @@
       </p>
     </dialog>
 
+    <div id="loading" style="padding:2em;text-align:center">
+      <div class="lds-ellipsis" style="font-size:48px;color:#888">
+        <div></div><div></div><div></div><div></div>
+      </div>
+    </div>
+
+    <div id="form-content" style="display:none">
+
     <p id="whoami"></p>
 
     <h1 id="title">Student Form</h1>
@@ -447,6 +455,8 @@
     </button>
     <p class="sibling">If you have an older sibling who will be in your first choice LC next year, please <a
         href="https://forms.gle/wVMaxnWj8GrtF33r8" target="_blank">fill out this form</a>.</p>
+
+    </div> <!-- #form-content -->
   </div>
   <script>
     /*
@@ -702,7 +712,7 @@ const showCurrentRanks = (currentRanks) => {
   maybeRemoveMandatory();
 };
 
-const getRankings = (studentEmail) => {
+const getRankings = (studentEmail, callback) => {
   const v = uiVersion;
   google.script.run.withSuccessHandler(res => {
     if (uiVersion !== v) return;
@@ -711,6 +721,7 @@ const getRankings = (studentEmail) => {
       showCurrentRanks(res.rankings);
     }
     disableButton('Rankings loaded');
+    callback?.();
   }).getRankings(studentEmail);
 };
 
@@ -802,6 +813,11 @@ const setupEventListeners = () => {
 
 setupEventListeners();
 
+const showForm = () => {
+  $('#loading').style.display = 'none';
+  $('#form-content').style.display = 'contents';
+};
+
 const setTitle = (heading, subtitle) => {
   $('title').innerText = `${heading}: ${subtitle}`;
   $('#title').innerText = heading;
@@ -828,6 +844,7 @@ const setupUI = (res) => {
     initStaffMode();
     disableButton('Enter student email to start');
     setTitle('Adult Form', 'On behalf of a student for Rising 10th Grade Lottery');
+    showForm();
   } else if (res.match(/@students\.berkeley\.net/)) {
     isStaff = false;
     $('#for-student').remove();
@@ -840,7 +857,7 @@ const setupUI = (res) => {
       if (lc) {
         initFromUpperGrades(lc);
       }
-      getRankings();
+      getRankings(undefined, showForm);
     }).getLcForStudent(res);
   }
 };
