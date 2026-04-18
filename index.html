@@ -557,7 +557,7 @@ const SLCS = new Set([...SMALL_LCS]);
 const ALL_LCS = new Set([...REQUIRED, ...SMALL_LCS]);
 
 // Months are zero-indexed in Date.
-const FORM_CLOSES = new Date(2026, 3, 19, 12 + 4, 0, 0);
+const FORM_CLOSES = new Date(2026, 3, 17, 12 + 4, 0, 0);
 
 let mandatory, ranks, smallSchools, button, spinner;
 
@@ -843,7 +843,7 @@ const setupUI = (res) => {
     $('#for-student').style.display = 'flex';
     initStaffMode();
     disableButton('Enter student email to start');
-    setTitle('Adult Form', 'On behalf of a student for Rising 10th Grade Lottery');
+    setTitle('Adult Form', 'On behalf of a student for either rising 10th or upper-grades lottery');
     showForm();
   } else if (res.match(/@students\.berkeley\.net/)) {
     isStaff = false;
